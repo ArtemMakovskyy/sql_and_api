@@ -1,0 +1,27 @@
+#  docker-compose
+version: "3.8"
+
+services:
+  db_docker_host:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: my_database
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: verysecret
+      MYSQL_USER: myuser
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  app:
+    depends_on:
+      - db_docker_host
+    restart: on-failure
+    build: .
+    ports:
+      - "8080:8080"
+      - "5005:5005"
